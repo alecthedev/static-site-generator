@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
     def test_props_to_html(self):
@@ -12,10 +12,10 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(node.props_to_html(),"")
 
     def test_repr(self):
-        node1 = HTMLNode("p", "This is a paragraph HTMLNode.", None, {"href": "https://www.google.com", "target": "_blank"})
-        node2 = HTMLNode("h1", "Hello", [node1], None)
-        self.assertEqual(str(node1), 'HTMLNode(Tag: p, Value: This is a paragraph HTMLNode., Children: 0, Properties: 2)')
-        self.assertEqual(str(node2), "HTMLNode(Tag: h1, Value: Hello, Children: 1, Properties: 0)")
+        node_1 = HTMLNode("p", "This is a paragraph HTMLNode.", None, {"href": "https://www.google.com", "target": "_blank"})
+        node_2 = HTMLNode("h1", "Hello", [node_1], None)
+        self.assertEqual(str(node_1), 'HTMLNode(Tag: p, Value: This is a paragraph HTMLNode., Children: 0, Properties: 2)')
+        self.assertEqual(str(node_2), "HTMLNode(Tag: h1, Value: Hello, Children: 1, Properties: 0)")
 
     def test_leaf_to_html(self):
         node = LeafNode("a", "Click Here!", {"href": "https://www.google.com"})
@@ -28,6 +28,33 @@ class TestHTMLNode(unittest.TestCase):
     def test_leaf_to_html_no_tag(self):
         node = LeafNode(None, "raw text")
         self.assertEqual(node.to_html(), "raw text")
+
+    def test_parent_to_html_two_children(self):
+        node = ParentNode(
+            "p",
+            [
+                  LeafNode("i", "italic text"),
+                  LeafNode(None, "normal text")
+            ],
+        )
+        self.assertEqual(node.to_html(), "<p><i>italic text</i>normal text</p>")
+
+    def test_nested_parent_nodes(self):
+        node = ParentNode(
+            "body",
+            [
+                LeafNode("h1", "Heading1"),
+                ParentNode(
+                    "p",
+                    [
+                        LeafNode("i", "Some text"),
+                        LeafNode("a", "A link", {"href": "https://www.google.com"})
+                    ]
+                ),
+                LeafNode("h4", "Heading4")
+            ]
+        )
+        self.assertEqual(node.to_html(), "<body><h1>Heading1</h1><p><i>Some text</i><a href=\"https://www.google.com\">A link</a></p><h4>Heading4</h4></body>")
 
 if __name__ == "__main__":
     unittest.main()
