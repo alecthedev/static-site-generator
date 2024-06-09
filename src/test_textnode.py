@@ -7,8 +7,8 @@ class TestTextNode(unittest.TestCase):
         node  = TextNode("This is a text node", "bold")
         node2 = TextNode("This is a text node", "bold")
         node3 = TextNode("This is another test", "italic", "https://google.com")
-        self.assertEqual(node, node2)
-        self.assertNotEqual(node2, node3)
+        self.assertEqual(str(node), str(node2))
+        self.assertNotEqual(str(node2), str(node3))
 
     def test_repr(self):
         node = TextNode("This is a text node without url", "italic")

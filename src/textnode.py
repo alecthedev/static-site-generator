@@ -14,13 +14,6 @@ class TextNode:
             self.url == target.url
         }
     
-    def __ne__(self, target) -> bool:
-        return {
-            self.text != target.text or
-            self.text_type != target.text_type or
-            self.url != target.url
-        }
-    
     def __repr__(self) -> str:
         return f"TextNode({self.text}, {self.text_type}, {self.url})"
     
