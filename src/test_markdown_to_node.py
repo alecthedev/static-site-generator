@@ -1,6 +1,6 @@
 import unittest
 from textnode import TextNode
-from inline_markdown import split_nodes_delimiter
+from markdown_to_node import *
 
 class TestInlineMarkdown(unittest.TestCase):
     def test_split_nodes_delimiter_code(self):
@@ -49,3 +49,24 @@ class TestInlineMarkdown(unittest.TestCase):
                   TextNode("Also at the end.", "italic"),
               ]
         ) 
+
+    def test_extract_markdown_images(self):
+        images = extract_markdown_images("This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://www.example.com/another)")
+        self.assertListEqual(
+            images, 
+            [
+                ('image', 'https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png'),
+                ('another', 'https://www.example.com/another')
+            ]
+        )
+
+    def test_extract_markdown_link(self):
+        links = extract_markdown_links("This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)")
+        self.assertListEqual(
+            links,
+            [
+                ("link", "https://www.example.com"),
+                ("another", "https://www.example.com/another")
+            ]
+        )
+            
