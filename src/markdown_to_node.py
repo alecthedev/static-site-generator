@@ -57,7 +57,33 @@ def split_nodes_image(original_nodes):
 
 
 def split_nodes_link(original_nodes):
-    pass
+    output_nodes = []
+
+    for node in original_nodes:
+        if not isinstance(node, TextNode):
+            output_nodes.append(node)
+            continue
+        # extract links (as text, to create nodes), or simply append if none are found
+        node_text = node.text
+        links = extract_markdown_links(node.text)
+        if len(links) == 0:
+            output_nodes.append(node)
+            continue
+        # separate link text from link url
+        for link in links:
+            split_link = node_text.split(f"[{link[0]}]({link[1]})", 1)
+            if len(split_link) != 2:
+                ValueError("Invalid syntax, Markdown tag not closed: link")
+            if split_link[0] != "":
+                output_nodes.append(TextNode(split_link[0], "text"))
+            # create new TextNode of type "link"
+            # link[0] being the text in front, link[1] being the url
+            output_nodes.append(TextNode(link[0], "link", link[1]))
+            # if there is any text after the link tag, create a 'text' TextNode
+            node_text = split_link[1]
+        if node_text != "":
+            output_nodes.append(TextNode(node_text, "text"))
+    return output_nodes
 
 
 def extract_markdown_images(text):
