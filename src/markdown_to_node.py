@@ -8,7 +8,7 @@ def split_nodes_delimiter(original_nodes, delimiter, text_type):
 
     for node in original_nodes:
         if not isinstance(node, TextNode):
-            output_nodes.append(original_nodes)
+            output_nodes.append(node)
             continue
         split_nodes = []
         split_texts = node.text.split(delimiter)
@@ -26,7 +26,34 @@ def split_nodes_delimiter(original_nodes, delimiter, text_type):
 
 
 def split_nodes_image(original_nodes):
-    pass
+    output_nodes = []
+
+    for node in original_nodes:
+        if not isinstance(node, TextNode):
+            output_nodes.append(node)
+            continue
+        # extract images (as text, to create nodes), or simply append if none are found
+        node_text = node.text
+        images = extract_markdown_images(node.text)
+        if len(images) == 0:
+            output_nodes.append(node)
+            continue
+        for image in images:
+            # separate image text from image hyperlink
+            split_image = node_text.split(f"![{image[0]}]({image[1]})", 1)
+            if len(split_image) != 2:
+                raise ValueError("Invalid syntax, Markdown tag not closed: image")
+            if split_image[0] != "":
+                # if there is text in front of the link, make a new text node
+                output_nodes.append(TextNode(split_image[0], "text"))
+            # create new TextNode of type "image"
+            # image[0] being the text in front, image[1] being the url
+            output_nodes.append(TextNode(image[0], "image", image[1]))
+            # if there is any text after the image tag, create a 'text' TextNode
+            node_text = split_image[1]
+        if node_text != "":
+            output_nodes.append(TextNode(node_text, "text"))
+    return output_nodes
 
 
 def split_nodes_link(original_nodes):

@@ -37,7 +37,7 @@ class TestInlineMarkdown(unittest.TestCase):
 
     def test_split_nodes_delimiter_starting_italic(self):
         node = TextNode("*This is a line of italic* at the beginning.", "text")
-        new_nodes = split_nodes_delimiter([node], "*", "code")
+        new_nodes = split_nodes_delimiter([node], "*", "italic")
         self.assertListEqual(
             new_nodes,
             [
@@ -50,7 +50,7 @@ class TestInlineMarkdown(unittest.TestCase):
         node = TextNode(
             "*This is a line of italic* at the beginning. *Also at the end.*", "text"
         )
-        new_nodes = split_nodes_delimiter([node], "*", "code")
+        new_nodes = split_nodes_delimiter([node], "*", "italic")
         self.assertListEqual(
             new_nodes,
             [
@@ -84,6 +84,30 @@ class TestInlineMarkdown(unittest.TestCase):
             [
                 ("link", "https://www.example.com"),
                 ("another", "https://www.example.com/another"),
+            ],
+        )
+
+    def test_split_nodes_image(self):
+        image_node = TextNode(
+            "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
+            "text",
+        )
+
+        self.assertListEqual(
+            split_nodes_image([image_node]),
+            [
+                TextNode("This is text with an ", "text"),
+                TextNode(
+                    "image",
+                    "image",
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
+                ),
+                TextNode(" and another ", "text"),
+                TextNode(
+                    "second image",
+                    "image",
+                    "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
+                ),
             ],
         )
 
