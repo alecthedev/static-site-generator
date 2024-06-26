@@ -7,7 +7,7 @@ def split_nodes_delimiter(original_nodes, delimiter, text_type):
     output_nodes = []
 
     for node in original_nodes:
-        if not isinstance(node, TextNode):
+        if node.text_type != "text":
             output_nodes.append(node)
             continue
         split_nodes = []
@@ -92,3 +92,16 @@ def extract_markdown_images(text):
 
 def extract_markdown_links(text):
     return re.findall(r"\[(.*?)\]\((.*?)\)", text)
+
+
+def text_to_textnodes(text):
+    # create a Textnode from the argument text, add to output list
+    output_nodes = [TextNode(text, "text")]
+    # split each node in the list into more nodes if necessary
+    output_nodes = split_nodes_delimiter(output_nodes, "**", "bold")
+    output_nodes = split_nodes_delimiter(output_nodes, "*", "italic")
+    output_nodes = split_nodes_delimiter(output_nodes, "`", "code")
+    output_nodes = split_nodes_image(output_nodes)
+    output_nodes = split_nodes_link(output_nodes)
+
+    return output_nodes
