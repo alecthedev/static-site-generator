@@ -1,62 +1,71 @@
 import unittest
 
 from markdown_to_node import *
-from textnode import TextNode
+from textnode import (
+    TextNode,
+    text_type_bold,
+    text_type_code,
+    text_type_image,
+    text_type_italic,
+    text_type_link,
+    text_type_text,
+)
 
 
 class TestInlineMarkdown(unittest.TestCase):
     def test_split_nodes_delimiter_code(self):
         node = TextNode(
             "This is a text node `with a code block in it` and I am splitting it.",
-            "text",
+            text_type_text,
         )
-        new_nodes = split_nodes_delimiter([node], "`", "code")
+        new_nodes = split_nodes_delimiter([node], "`", text_type_code)
         self.assertListEqual(
             new_nodes,
             [
-                TextNode("This is a text node ", "text"),
-                TextNode("with a code block in it", "code"),
-                TextNode(" and I am splitting it.", "text"),
+                TextNode("This is a text node ", text_type_text),
+                TextNode("with a code block in it", text_type_code),
+                TextNode(" and I am splitting it.", text_type_text),
             ],
         )
 
     def test_split_nodes_delimiter_bold(self):
         node = TextNode(
             "This is a text node **with bold words in it** and I am splitting it.",
-            "text",
+            text_type_text,
         )
-        new_nodes = split_nodes_delimiter([node], "**", "bold")
+        new_nodes = split_nodes_delimiter([node], "**", text_type_bold)
         self.assertListEqual(
             new_nodes,
             [
-                TextNode("This is a text node ", "text"),
-                TextNode("with bold words in it", "bold"),
-                TextNode(" and I am splitting it.", "text"),
+                TextNode("This is a text node ", text_type_text),
+                TextNode("with bold words in it", text_type_bold),
+                TextNode(" and I am splitting it.", text_type_text),
             ],
         )
 
     def test_split_nodes_delimiter_starting_italic(self):
-        node = TextNode("*This is a line of italic* at the beginning.", "text")
-        new_nodes = split_nodes_delimiter([node], "*", "italic")
+        node = TextNode("*This is a line of italic* at the beginning.", text_type_text)
+        new_nodes = split_nodes_delimiter([node], "*", text_type_italic)
         self.assertListEqual(
             new_nodes,
             [
-                TextNode("This is a line of italic", "italic"),
-                TextNode(" at the beginning.", "text"),
+                TextNode("This is a line of italic", text_type_italic),
+                TextNode(" at the beginning.", text_type_text),
             ],
         )
 
     def test_split_nodes_delimiter_multiple_italic(self):
         node = TextNode(
-            "*This is a line of italic* at the beginning. *Also at the end.*", "text"
+            "*This is a line of italic* at the beginning. *Also at the end.*",
+            text_type_text,
         )
-        new_nodes = split_nodes_delimiter([node], "*", "italic")
+        new_nodes = split_nodes_delimiter([node], "*", text_type_italic)
         self.assertListEqual(
             new_nodes,
             [
-                TextNode("This is a line of italic", "italic"),
-                TextNode(" at the beginning. ", "text"),
-                TextNode("Also at the end.", "italic"),
+                TextNode("This is a line of italic", text_type_italic),
+                TextNode(" at the beginning. ", text_type_text),
+                TextNode("Also at the end.", text_type_italic),
             ],
         )
 
@@ -90,22 +99,22 @@ class TestInlineMarkdown(unittest.TestCase):
     def test_split_nodes_image(self):
         image_node = TextNode(
             "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and another ![second image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png)",
-            "text",
+            text_type_text,
         )
 
         self.assertListEqual(
             split_nodes_image([image_node]),
             [
-                TextNode("This is text with an ", "text"),
+                TextNode("This is text with an ", text_type_text),
                 TextNode(
                     "image",
-                    "image",
+                    text_type_image,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
                 ),
-                TextNode(" and another ", "text"),
+                TextNode(" and another ", text_type_text),
                 TextNode(
                     "second image",
-                    "image",
+                    text_type_image,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/3elNhQu.png",
                 ),
             ],
@@ -114,16 +123,16 @@ class TestInlineMarkdown(unittest.TestCase):
     def test_split_nodes_link(self):
         link_node = TextNode(
             "This is text with a [link](https://www.google.com) and another [second link](https://www.bing.com)",
-            "text",
+            text_type_link,
         )
 
         self.assertListEqual(
             split_nodes_link([link_node]),
             [
-                TextNode("This is text with a ", "text"),
-                TextNode("link", "link", "https://www.google.com"),
-                TextNode(" and another ", "text"),
-                TextNode("second link", "link", "https://www.bing.com"),
+                TextNode("This is text with a ", text_type_text),
+                TextNode("link", text_type_link, "https://www.google.com"),
+                TextNode(" and another ", text_type_text),
+                TextNode("second link", text_type_link, "https://www.bing.com"),
             ],
         )
 
@@ -133,19 +142,19 @@ class TestInlineMarkdown(unittest.TestCase):
         self.assertListEqual(
             text_to_textnodes(text),
             [
-                TextNode("This is ", "text"),
-                TextNode("text", "bold"),
-                TextNode(" with an ", "text"),
-                TextNode("italic", "italic"),
-                TextNode(" word and a ", "text"),
-                TextNode("code block", "code"),
-                TextNode(" and an ", "text"),
+                TextNode("This is ", text_type_text),
+                TextNode("text", text_type_bold),
+                TextNode(" with an ", text_type_text),
+                TextNode("italic", text_type_italic),
+                TextNode(" word and a ", text_type_text),
+                TextNode("code block", text_type_code),
+                TextNode(" and an ", text_type_text),
                 TextNode(
                     "image",
-                    "image",
+                    text_type_image,
                     "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png",
                 ),
-                TextNode(" and a ", "text"),
-                TextNode("link", "link", "https://boot.dev"),
+                TextNode(" and a ", text_type_text),
+                TextNode("link", text_type_link, "https://boot.dev"),
             ],
         )
