@@ -18,6 +18,14 @@ class HTMLNode:
     def __repr__(self) -> str:
         return f"HTMLNode(Tag: {self.tag}, Value: {self.value}, Children: {len(self.children) if self.children != None else 0}, Properties: {len(list(self.props)) if self.props != None else 0})"
 
+    def __eq__(self, target) -> bool:
+        return (
+            self.tag == target.tag
+            and self.value == target.value
+            and self.children == target.children
+            and self.props == target.props
+        )
+
 
 class LeafNode(HTMLNode):
     def __init__(self, tag=None, value=None, props=None):
@@ -43,4 +51,3 @@ class ParentNode(HTMLNode):
             raise ValueError("ParentNode children cannot be None")
 
         return f"<{self.tag}>{''.join(child.to_html() for child in self.children)}</{self.tag}>"
-
