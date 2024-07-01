@@ -1,17 +1,19 @@
-from textnode import (
-    TextNode,
-    text_type_bold,
-    text_type_code,
-    text_type_image,
-    text_type_italic,
-    text_type_link,
-    text_type_text,
-)
+import os
+import shutil
+
+from static_to_public import copy_dir
 
 
 def main():
-    dummy_node = TextNode("This is a text node", text_type_link, "https://www.boot.dev")
-    print(dummy_node)
+    static_path = "./static"
+    public_path = "./public/"
+
+    if os.path.exists(public_path):
+        print(f"Removing {public_path}")
+        shutil.rmtree(public_path)
+
+    print(f"Copying {static_path} to {public_path}")
+    copy_dir(static_path, public_path)
 
 
 main()
