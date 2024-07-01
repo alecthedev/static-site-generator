@@ -112,7 +112,7 @@ def unordered_list_block_to_html(block):
     list_items = block.split("\n")
     node_list = []
     for item in list_items:
-        node_list.append(ParentNode("li", text_to_children(item.strip("*- "))))
+        node_list.append(ParentNode("li", text_to_children(item[2:])))
     return ParentNode("ul", node_list)
 
 
